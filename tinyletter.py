@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--body', help='Which file to read', type=str)
 parser.add_argument('--title', help='A title for the newsletter', type=str)
 parser.add_argument('--id', help='The id of a newsletter', type=int)
+parser.add_argument('--quick', help="Send without saving draft", action='store_true')
 group = parser.add_mutually_exclusive_group()
 group.add_argument('-preview', help='preview a newsletter', action='store_true')
 group.add_argument('-send', help='Send a newsletter', action='store_true')
@@ -38,7 +39,13 @@ else:
         draft.subject = args.title
         draft.body = open(args.body, 'r+').read()
         draft.save()
-        print(draft.message_id)
+
+        #One quick argument to send fast messages. 
+        if args.quick:
+            draft.send()
+            print('{} was sent.'.format(draft.message_id))
+        else:
+            print('{} was saved as draft.'.format(draft.message_id))
 
         draft.send_preview()
     elif (args.title and not args.body) or (args.body and not args.title):
